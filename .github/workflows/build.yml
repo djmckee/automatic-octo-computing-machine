@@ -1,0 +1,38 @@
+name: process data
+
+on:
+  push:
+    branches:
+      - main
+      - setup-ci
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_S3_BUCKET_NAME: nebula-mapping
+    steps:
+      - uses: actions/checkout@master
+      - uses: keithweaver/aws-s3-github-action@v1.0.0
+        name: Download data from S3 Bucket
+        with:
+          command: cp
+          source: s3://nebula-mapping/gtfs.zip
+          destination: newcastle/gtfs.zip
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+      - uses: docker-practice/actions-setup-docker@master
+      - run: |
+          set -x
+          docker version
+          docker run --rm -e JAVA_OPTIONS=-Xmx6G -v $(pwd)/newcastle:/var/opentripplanner docker.io/opentripplanner/opentripplanner:latest --build --save
+      - uses: jakejarvis/s3-sync-action@master
+        name: Upload App to S3 Bucket
+        with:
+          args: --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ env.AWS_S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-central-1"
+          SOURCE_DIR: "newcastle"
