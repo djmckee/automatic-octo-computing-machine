@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - setup-ci
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
