@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Get input files
-        run: wget -O newcastle/gtfs.zip ${{ secrets.input }}
+        run: wget -q -O newcastle/gtfs.zip ${{ secrets.input }}
       - uses: docker-practice/actions-setup-docker@master
       - run: |
           set -x
