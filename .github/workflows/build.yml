@@ -13,15 +13,8 @@ jobs:
       AWS_S3_BUCKET_NAME: nebula-mapping
     steps:
       - uses: actions/checkout@master
-      - uses: keithweaver/aws-s3-github-action@v1.0.0
-        name: Download data from S3 Bucket
-        with:
-          command: cp
-          source: s3://nebula-mapping/gtfs.zip
-          destination: newcastle/gtfs.zip
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: eu-west-2
+      - name: Get input files
+        run: wget -O newcastle/gtfs.zip ${{ secrets.input }}
       - uses: docker-practice/actions-setup-docker@master
       - run: |
           set -x
