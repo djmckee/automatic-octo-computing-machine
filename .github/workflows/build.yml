@@ -2,6 +2,8 @@ name: process data
 
 on:
   push:
+    schedule:
+      - cron: '0 0 * * *'
     branches:
       - main
       - setup-ci
