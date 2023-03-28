@@ -19,7 +19,7 @@ jobs:
         run: |
           set -x
           docker version
-          docker run --rm -e JAVA_OPTIONS=-Xmx6G -v $(pwd)/newcastle:/var/opentripplanner docker.io/opentripplanner/opentripplanner:latest --build --save
+          docker run --rm -e JAVA_OPTIONS=-Xmx6G -v $(pwd)/newcastle:/var/opentripplanner docker.io/opentripplanner/opentripplanner:4f78545643517533f5da7a622cd95c97d9bd7203 --build --save
       - uses: jakejarvis/s3-sync-action@master
         name: Upload App to S3 Bucket
         with:
