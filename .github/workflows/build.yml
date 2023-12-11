@@ -1,0 +1,38 @@
+name: process data
+
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  push:
+    branches:
+      - main
+      - setup-ci
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_S3_BUCKET_NAME: nebula-mapping
+    steps:
+      - uses: actions/checkout@master
+      - name: Get input files
+        run: wget -q -O newcastle/gtfs.zip ${{ secrets.input }}
+      - uses: docker-practice/actions-setup-docker@master
+      - name: Build files
+        run: |
+          set -x
+          docker version
+          docker run --rm -e JAVA_OPTIONS=-Xmx6G -v $(pwd)/newcastle:/var/opentripplanner docker.io/opentripplanner/opentripplanner:4f78545643517533f5da7a622cd95c97d9bd7203 --build --save
+      - uses: jakejarvis/s3-sync-action@master
+        name: Upload App to S3 Bucket
+        with:
+          args: --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ env.AWS_S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-west-2"
+
+  
+          SOURCE_DIR: "newcastle"
+      - name: Update
+        run: curl --location --request POST ${{ secrets.URL }}
