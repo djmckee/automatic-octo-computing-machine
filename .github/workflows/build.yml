@@ -1,10 +1,8 @@
 name: process data
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '30 5 * * 1,3'
-    - cron: '30 5 * * 2,4'
+    - cron: '30 5 * * *'
   push:
     branches:
       - main
